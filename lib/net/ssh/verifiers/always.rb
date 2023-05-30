@@ -24,7 +24,20 @@ module Net
 
           found = host_keys.any? do |key|
             if key.respond_to?(:matches_key?)
-              key.matches_key?(arguments[:key])
+              unless key.matches_key?(arguments[:key])
+                next false
+              end
+            end
+
+            if key.respond_to?(:matches_principal?)
+              hostname_to_verify = host_keys.host.split(",").first
+              principal_match = key.matches_principal?(arguments[:key], hostname_to_verify)
+
+              if principal_match
+                true
+              else
+                process_cache_miss(host_keys, arguments, HostKeyUnknown, "name is not a listed principal")
+              end
             else
               key.ssh_type == arguments[:key].ssh_type && key.to_blob == arguments[:key].to_blob
             end

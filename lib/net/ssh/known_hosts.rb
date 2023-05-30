@@ -55,6 +55,10 @@ module Net
           @comment = comment
         end
 
+        def matches_principal?(server_key, host)
+          server_key.valid_principals.empty? || server_key.valid_principals.include?(host)
+        end
+
         def matches_key?(server_key)
           if ssh_types.include?(server_key.ssh_type)
             server_key.signature_valid? && (server_key.signature_key.to_blob == @key.to_blob)
