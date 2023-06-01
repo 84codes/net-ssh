@@ -21,25 +21,24 @@ module Net
 
           # If we found any matches, check to see that the key type and
           # blob also match.
-
-          found = host_keys.any? do |key|
+          found = host_keys.find do |key|
             if key.respond_to?(:matches_key?)
-              unless key.matches_key?(arguments[:key])
-                next false
-              end
-            end
-
-            if key.respond_to?(:matches_principal?)
-              hostname_to_verify = host_keys.host.split(",").first
-              principal_match = key.matches_principal?(arguments[:key], hostname_to_verify)
-
-              if principal_match
-                true
-              else
-                process_cache_miss(host_keys, arguments, HostKeyUnknown, "name is not a listed principal")
-              end
+              key.matches_key?(arguments[:key])
             else
               key.ssh_type == arguments[:key].ssh_type && key.to_blob == arguments[:key].to_blob
+            end
+          end
+
+          if found && found.respond_to?(:matches_principal?)
+            # one.hosts.netssh
+            # one.hosts.netssh,127.0.0.1
+            # [one.hosts.netssh]:2200
+            # [one.hosts.netssh]:2200,[127.0.0.1]:2200
+            hostname_to_verify = host_keys.host.split(",").first.gsub(/\[|\]:\d+/, "")
+            principal_match = found.matches_principal?(arguments[:key], hostname_to_verify)
+
+            unless principal_match
+              process_cache_miss(host_keys, arguments, HostKeyUnknown, "name is not a listed principal")
             end
           end
 
@@ -47,7 +46,7 @@ module Net
           # indicating that the key was not recognized.
           process_cache_miss(host_keys, arguments, HostKeyMismatch, "does not match") unless found
 
-          found
+          true
         end
 
         def verify_signature(&block)
