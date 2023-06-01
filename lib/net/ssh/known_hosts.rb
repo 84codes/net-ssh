@@ -120,7 +120,12 @@ module Net
         # Search for all known keys for the given host, in every file given in
         # the +files+ array. Returns the list of keys.
         def search_in(files, host, options = {})
-          files.flat_map { |file| KnownHosts.new(file).keys_for(host, options) }
+          # one.hosts.netssh
+          # one.hosts.netssh,127.0.0.1
+          # [one.hosts.netssh]:2200
+          # [one.hosts.netssh]:2200,[127.0.0.1]:2200
+          host_to_search_for = host.split(",").first.gsub(/\[|\]:\d+/, "")
+          files.flat_map { |file| KnownHosts.new(file).keys_for(host_to_search_for, options) }
         end
 
         # Looks in the given +options+ hash for the :user_known_hosts_file and
