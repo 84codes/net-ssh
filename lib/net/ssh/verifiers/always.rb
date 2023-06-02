@@ -38,7 +38,7 @@ module Net
             principal_match = found.matches_principal?(arguments[:key], hostname_to_verify)
 
             unless principal_match
-              process_cache_miss(host_keys, arguments, HostKeyUnknown, "name is not a listed principal")
+              process_cache_miss(host_keys, arguments, HostKeyUnknown, "Certificate invalid: name is not a listed principal")
             end
           end
 
