@@ -55,13 +55,8 @@ module Net
           @comment = comment
         end
 
-        def matches_principal?(server_key, host)
-          # one.hosts.netssh
-          # one.hosts.netssh,127.0.0.1
-          # [one.hosts.netssh]:2200
-          # [one.hosts.netssh]:2200,[127.0.0.1]:2200
-          host_to_match = host.split(",").first.gsub(/\[|\]:\d+/, "")
-          server_key.valid_principals.empty? || server_key.valid_principals.include?(host_to_match)
+        def matches_principal?(server_key, hostname)
+          server_key.valid_principals.empty? || server_key.valid_principals.include?(hostname)
         end
 
         def matches_key?(server_key)
@@ -98,6 +93,15 @@ module Net
 
       def empty?
         @host_keys.empty?
+      end
+
+      def hostname
+        # host can be any of these, we want the first variant
+        # one.hosts.netssh
+        # one.hosts.netssh,127.0.0.1
+        # [one.hosts.netssh]:2200
+        # [one.hosts.netssh]:2200,[127.0.0.1]:2200
+        @host.split(",").first.gsub(/\[|\]:\d+/, "")
       end
     end
 
