@@ -29,17 +29,16 @@ module Net
             end
           end
 
-          if found && found.respond_to?(:matches_principal?)
+          if found.respond_to?(:matches_principal?)
             # one.hosts.netssh
             # one.hosts.netssh,127.0.0.1
             # [one.hosts.netssh]:2200
             # [one.hosts.netssh]:2200,[127.0.0.1]:2200
             hostname_to_verify = host_keys.host.split(",").first.gsub(/\[|\]:\d+/, "")
-            principal_match = found.matches_principal?(arguments[:key], hostname_to_verify)
 
-            unless principal_match
-              process_cache_miss(host_keys, arguments, HostKeyUnknown, "Certificate invalid: name is not a listed principal")
-            end
+            return true if found.matches_principal?(arguments[:key], hostname_to_verify)
+
+            process_cache_miss(host_keys, arguments, HostKeyUnknown, "Certificate invalid: name is not a listed principal")
           end
 
           # If a match was found, return true. Otherwise, raise an exception
