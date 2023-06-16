@@ -32,6 +32,7 @@ module Net
           # If found host_key has principal support (CertAuthority), it must match
           if found.respond_to?(:matches_principal?)
             return true if found.matches_principal?(arguments[:key], host_keys.hostname)
+
             process_cache_miss(host_keys, arguments, HostKeyUnknown, "Certificate invalid: name is not a listed principal")
           end
 
