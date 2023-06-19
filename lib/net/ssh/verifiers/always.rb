@@ -21,7 +21,7 @@ module Net
 
           # If we found any matches, check to see that the key type and
           # blob also match.
-          found = host_keys.find do |key|
+          found_keys = host_keys.find do |key|
             if key.respond_to?(:matches_key?)
               key.matches_key?(arguments[:key])
             else
@@ -29,17 +29,18 @@ module Net
             end
           end
 
+          # If a match was found, return true. Otherwise, raise an exception
+          # indicating that the key was not recognized.
+          process_cache_miss(host_keys, arguments, HostKeyMismatch, "does not match") unless found_keys
+
           # If found host_key has principal support (CertAuthority), it must match
-          if found.respond_to?(:matches_principal?)
-            return true if found.matches_principal?(arguments[:key], host_keys.hostname)
+          if found_keys.respond_to?(:matches_principal?)
+            return true if found_keys.matches_principal?(arguments[:key], host_keys.hostname)
 
             process_cache_miss(host_keys, arguments, HostKeyUnknown, "Certificate invalid: name is not a listed principal")
           end
 
-          # If a match was found, return true. Otherwise, raise an exception
-          # indicating that the key was not recognized.
-          process_cache_miss(host_keys, arguments, HostKeyMismatch, "does not match") unless found
-
+          # If we passed all checks, it's verified
           true
         end
 
