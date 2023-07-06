@@ -19,6 +19,7 @@ module Net
           # We've never seen this host before, so raise an exception.
           process_cache_miss(host_keys, arguments, HostKeyUnknown, "is unknown") if host_keys.empty?
 
+
           # If we found any matches, check to see that the key type and
           # blob also match.
           found_keys = host_keys.find do |key|
@@ -32,6 +33,14 @@ module Net
           # If a match was found, return true. Otherwise, raise an exception
           # indicating that the key was not recognized.
           process_cache_miss(host_keys, arguments, HostKeyMismatch, "does not match") unless found_keys
+
+          if found_keys.respond_to?(:matches_validity?)
+            unless found_keys.matches_validity?(arguments[:key])
+              binding.break
+              # TODO why not valid?
+              process_cache_miss(host_keys, arguments, HostKeyUnknown, "Certificate not valid")
+            end
+          end
 
           # If found host_key has principal support (CertAuthority), it must match
           if found_keys.respond_to?(:matches_principal?)
