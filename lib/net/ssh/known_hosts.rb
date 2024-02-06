@@ -56,20 +56,17 @@ module Net
         end
 
         def matches_principal?(server_key, hostname)
-          pp [:debug, :valid_principals, server_key.valid_principals]
           server_key.valid_principals.empty? || server_key.valid_principals.include?(hostname)
         end
 
         def matches_validity?(server_key)
           # If valid_after is in the future, fail
           if server_key.valid_after && server_key.valid_after > Time.now
-            pp [:debug, :after, server_key.valid_after, Time.now]
             return false
           end
 
           # if valid_before is in the past, fail
           if server_key.valid_before && server_key.valid_before < Time.now
-            pp [:debug, :before, server_key.valid_before, Time.now]
             return false
           end
 
