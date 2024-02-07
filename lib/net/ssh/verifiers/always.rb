@@ -36,7 +36,6 @@ module Net
 
           if found_keys.respond_to?(:matches_validity?)
             unless found_keys.matches_validity?(arguments[:key])
-              binding.break
               # TODO why not valid?
               process_cache_miss(host_keys, arguments, HostKeyUnknown, "Certificate not valid")
             end
