@@ -59,6 +59,7 @@ module Net
           server_key.valid_principals.empty? || server_key.valid_principals.include?(hostname)
         end
 
+        # TODO: this should be unit tested
         def matches_validity?(server_key)
           # If valid_after is in the future, fail
           if server_key.valid_after && server_key.valid_after > Time.now
