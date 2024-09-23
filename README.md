@@ -64,6 +64,7 @@ Unsecure algoritms will definitely be removed in Net::SSH 8.*.
 | Name                                 | Support               | Details  |
 |--------------------------------------|-----------------------|----------|
 | aes256-ctr / aes192-ctr / aes128-ctr | OK                    |          |
+| chacha20-poly1305@openssh.com        | OK.                   | Requires the gem `rbnacl` |
 | aes256-cbc / aes192-cbc / aes128-cbc | Deprecated in 6.0     | unsecure, will be removed in 8.0 |
 | rijndael-cbc@lysator.liu.se          | Deprecated in 6.0     | unsecure, will be removed in 8.0 |
 | blowfish-ctr blowfish-cbc            | Deprecated in 6.0     | unsecure, will be removed in 8.0 |
@@ -247,6 +248,8 @@ mv gem-public_cert.pem net-ssh-public_cert.pem
 gem cert --add net-ssh-public_cert.pem
 ```
 
+or `rake cert:update_public_when_expired`
+
 ## Security contact information
 
 See [SECURITY.md](SECURITY.md)
@@ -270,6 +273,9 @@ Thank you to all our backers! 🙏 [Become a backer](https://opencollective.com/
 Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [Become a sponsor](https://opencollective.com/net-ssh#sponsor)
 
 [![Sponsor](https://opencollective.com/net-ssh/sponsor/0/avatar.svg)](https://opencollective.com/net-ssh/sponsor/0/website)
+
+[<img src="https://github.com/net-ssh/net-ssh/assets/52435/9690bf3e-34ea-4c52-8aea-1cc4cb5bcb6d" width="320">](https://ubicloud.com)
+
 
 ## LICENSE:
 
