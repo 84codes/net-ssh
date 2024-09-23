@@ -19,10 +19,10 @@ module Net
           # We've never seen this host before, so raise an exception.
           process_cache_miss(host_keys, arguments, HostKeyUnknown, "is unknown") if host_keys.empty?
 
+
           # If we found any matches, check to see that the key type and
           # blob also match.
-
-          found = host_keys.any? do |key|
+          found_keys = host_keys.find do |key|
             if key.respond_to?(:matches_key?)
               key.matches_key?(arguments[:key])
             else
@@ -32,9 +32,24 @@ module Net
 
           # If a match was found, return true. Otherwise, raise an exception
           # indicating that the key was not recognized.
-          process_cache_miss(host_keys, arguments, HostKeyMismatch, "does not match") unless found
+          process_cache_miss(host_keys, arguments, HostKeyMismatch, "does not match") unless found_keys
 
-          found
+          if found_keys.respond_to?(:matches_validity?)
+            unless found_keys.matches_validity?(arguments[:key])
+              # TODO why not valid?
+              process_cache_miss(host_keys, arguments, HostKeyUnknown, "Certificate not valid")
+            end
+          end
+
+          # If found host_key has principal support (CertAuthority), it must match
+          if found_keys.respond_to?(:matches_principal?)
+            return true if found_keys.matches_principal?(arguments[:key], host_keys.hostname)
+
+            process_cache_miss(host_keys, arguments, HostKeyUnknown, "Certificate invalid: name is not a listed principal")
+          end
+
+          # If we passed all checks, it's verified
+          true
         end
 
         def verify_signature(&block)

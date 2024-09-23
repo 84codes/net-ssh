@@ -54,6 +54,25 @@ module Net
           @comment = comment
         end
 
+        def matches_principal?(server_key, hostname)
+          server_key.valid_principals.empty? || server_key.valid_principals.include?(hostname)
+        end
+
+        # TODO: this should be unit tested
+        def matches_validity?(server_key)
+          # If valid_after is in the future, fail
+          if server_key.valid_after && server_key.valid_after > Time.now
+            return false
+          end
+
+          # if valid_before is in the past, fail
+          if server_key.valid_before && server_key.valid_before < Time.now
+            return false
+          end
+
+          true
+        end
+
         def matches_key?(server_key)
           if ssh_types.include?(server_key.ssh_type)
             server_key.signature_valid? && (server_key.signature_key.to_blob == @key.to_blob)
@@ -88,6 +107,15 @@ module Net
 
       def empty?
         @host_keys.empty?
+      end
+
+      def hostname
+        # host can be any of these, we want the first variant
+        # one.hosts.netssh
+        # one.hosts.netssh,127.0.0.1
+        # [one.hosts.netssh]:2200
+        # [one.hosts.netssh]:2200,[127.0.0.1]:2200
+        @host.split(",").first.gsub(/\[|\]:\d+/, "")
       end
     end
 

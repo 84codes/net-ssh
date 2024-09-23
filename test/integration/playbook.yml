@@ -143,6 +143,9 @@
     - name: add host aliases2
       lineinfile: dest='/etc/hosts' owner='root' group='root' mode=0644
         regexp='^127\.0\.0\.1\s+one.hosts.netssh' line='127.0.0.1  one.hosts.netssh'
+    - name: add host aliases3
+      lineinfile: dest='/etc/hosts' owner='root' group='root' mode=0644
+        regexp='^127\.0\.0\.1\s+anotherone.hosts.netssh' line='127.0.0.1  anotherone.hosts.netssh'
     - name: Update APT Cache
       apt:
         update_cache: yes
